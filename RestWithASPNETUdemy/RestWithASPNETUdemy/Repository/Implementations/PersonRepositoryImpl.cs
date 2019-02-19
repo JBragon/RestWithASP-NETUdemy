@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using RestWithASPNETUdemy.Models;
 using RestWithASPNETUdemy.Models.Context;
+using RestWithASPNETUdemy.Repository;
 
-namespace RestWithASPNETUdemy.Services.Implementations
+namespace RestWithASPNETUdemy.Business.Implementations
 {
-    public class PersonServiceImpl : IPersonService
+    public class PersonRepositoryImpl : IPersonRepository
     {
         private PostgreSQLContext _context;
 
-        public PersonServiceImpl(PostgreSQLContext context)
+        public PersonRepositoryImpl(PostgreSQLContext context)
         {
             _context = context;
         }
@@ -62,7 +62,7 @@ namespace RestWithASPNETUdemy.Services.Implementations
 
         public Person Update(Person person)
         {
-            if (!Exist(person.Id))
+            if (!Exists(person.Id))
                 return new Person();
 
             var result = _context.Persons.SingleOrDefault(p => p.Id.Equals(person.Id));
@@ -79,7 +79,7 @@ namespace RestWithASPNETUdemy.Services.Implementations
             return person;
         }
 
-        private bool Exist(long id)
+        public bool Exists(long? id)
         {
             return _context.Persons.Any(p => p.Id.Equals(id));
         }
