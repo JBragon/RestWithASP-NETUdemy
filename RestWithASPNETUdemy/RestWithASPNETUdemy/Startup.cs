@@ -20,19 +20,45 @@ namespace RestWithASPNETUdemy
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly ILogger _logger;
+        public IConfiguration _configuration { get; }
+        public IHostingEnvironment _enviroment { get; }
+
+        public Startup(IConfiguration configuration, ILogger<Startup> logger, IHostingEnvironment enviroment)
         {
-            Configuration = configuration;
+            _configuration = configuration;
+            _logger = logger;
+            _enviroment = enviroment;
         }
 
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connection = Configuration["PostgreSQLConnection:PostgreSQLConnectionString"];
+            var connectionString = _configuration["MySQLConnection:MySQLConnectionString"];
 
-            services.AddDbContext<PostgreSQLContext>(options => options.UseNpgsql(connection));
+            services.AddDbContext<MySQLContext>(options => options.UseMySql(connectionString));
+
+            if (_enviroment.IsDevelopment())
+            {
+                try
+                {
+                    var evolveConnection = new MySql.Data.MySqlClient.MySqlConnection(connectionString);
+
+                    var evolve = new Evolve.Evolve(evolveConnection, msg => _logger.LogInformation(msg))
+                    {
+                        Locations = new List<string> { "db/migrations" },
+                        IsEraseDisabled = true
+                    };
+
+                    evolve.Migrate();
+                }
+                catch(Exception e)
+                {
+                    _logger.LogCritical("Database migration failed", e);
+                    throw;
+                }
+            }
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 

@@ -9,9 +9,9 @@ namespace RestWithASPNETUdemy.Business.Implementations
 {
     public class PersonRepositoryImpl : IPersonRepository
     {
-        private PostgreSQLContext _context;
+        private MySQLContext _context;
 
-        public PersonRepositoryImpl(PostgreSQLContext context)
+        public PersonRepositoryImpl(MySQLContext context)
         {
             _context = context;
         }

@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace RestWithASPNETUdemy.Models.Context
 {
-    public class PostgreSQLContext : DbContext
+    public class MySQLContext : DbContext
     {
-        public PostgreSQLContext()
+        public MySQLContext()
         {
 
         }
 
-        public PostgreSQLContext(DbContextOptions<PostgreSQLContext> options) : base(options) {}
+        public MySQLContext(DbContextOptions<MySQLContext> options) : base(options) {}
 
         public DbSet<Person> Persons { get; set; }
     }
