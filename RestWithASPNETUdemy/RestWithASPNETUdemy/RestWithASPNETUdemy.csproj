@@ -5,19 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="db\dataset\" />
-    <Folder Include="NewFolder\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="db\migrations\**\*.sql">
+    <Content Include="db\**\*.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="db\migrations\V1_0_2__Alter_Table_Persons.sql" />
+    <None Remove="db\migrations\V1_0_3__Create_Table_books.sql" />
   </ItemGroup>
 
   <ItemGroup>

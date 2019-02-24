@@ -8,12 +8,11 @@ using System.Threading.Tasks;
 
 namespace RestWithASPNETUdemy.Models
 {
-
-    public class Person : BaseEntity
+    public class Book : BaseEntity
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Address { get; set; }
-        public string Gender { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public decimal Price { get; set; }
+        public DateTime LaunchDate { get; set; }
     }
 }
