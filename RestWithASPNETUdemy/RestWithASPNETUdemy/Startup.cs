@@ -65,6 +65,7 @@ namespace RestWithASPNETUdemy
             services.AddMvc(options =>
             {
                 options.RespectBrowserAcceptHeader = true;
+                //configurando o tipo de resposta da API
                 options.FormatterMappings.SetMediaTypeMappingForFormat("xml", MediaTypeHeaderValue.Parse("text/xml"));
                 options.FormatterMappings.SetMediaTypeMappingForFormat("xml", MediaTypeHeaderValue.Parse("application/json"));
             }).AddXmlSerializerFormatters().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

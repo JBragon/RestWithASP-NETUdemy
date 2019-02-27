@@ -8,6 +8,7 @@ namespace RestWithASPNETUdemy.Data.VO
     [DataContract]
     public class BookVO
     {
+        //Parametro para ordenar o campo no momento de apresentar e criar um alias para o mesmo
         [DataMember(Order = 1, Name = "codigo")]
         public long? Id { get; set; }
 
