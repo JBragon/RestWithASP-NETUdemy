@@ -17,6 +17,8 @@ using RestWithASPNETUdemy.Business.Implementations;
 using RestWithASPNETUdemy.Repository;
 using RestWithASPNETUdemy.Repository.Generic;
 using Microsoft.Net.Http.Headers;
+using Tapioca.HATEOAS;
+using RestWithASPNETUdemy.HyperMedia;
 
 namespace RestWithASPNETUdemy
 {
@@ -67,8 +69,14 @@ namespace RestWithASPNETUdemy
                 options.RespectBrowserAcceptHeader = true;
                 //configurando o tipo de resposta da API
                 options.FormatterMappings.SetMediaTypeMappingForFormat("xml", MediaTypeHeaderValue.Parse("text/xml"));
-                options.FormatterMappings.SetMediaTypeMappingForFormat("xml", MediaTypeHeaderValue.Parse("application/json"));
+                options.FormatterMappings.SetMediaTypeMappingForFormat("json", MediaTypeHeaderValue.Parse("application/json"));
             }).AddXmlSerializerFormatters().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            HyperMediaFilterOptions filterOptions = new HyperMediaFilterOptions();
+
+            filterOptions.ObjectContentResponseEnricherList.Add(new PersonEnricher());
+
+            services.AddSingleton(filterOptions);
 
             services.AddApiVersioning();
 
@@ -94,7 +102,13 @@ namespace RestWithASPNETUdemy
             }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+
+            app.UseMvc(routes =>{
+                routes.MapRoute(
+                    name: "DefaultApi",
+                    template: "{controller=Values}/{id?}"
+                    );
+            });
         }
     }
 }
