@@ -3,6 +3,7 @@ using RestWithASPNETUdemy.Models;
 using RestWithASPNETUdemy.Business;
 using RestWithASPNETUdemy.Data.VO;
 using Tapioca.HATEOAS;
+using System.Collections.Generic;
 
 namespace RestWithASPNETUdemy.Controllers
 {
@@ -20,6 +21,10 @@ namespace RestWithASPNETUdemy.Controllers
 
         // GET api/values
         [HttpGet]
+        [ProducesResponseType(typeof(List<PersonVO>), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Get()
         {
@@ -28,6 +33,11 @@ namespace RestWithASPNETUdemy.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(PersonVO), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Get(int id)
         {
@@ -40,6 +50,9 @@ namespace RestWithASPNETUdemy.Controllers
 
         // POST api/values
         [HttpPost]
+        [ProducesResponseType(typeof(PersonVO), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Post([FromBody] PersonVO person)
         {
@@ -50,6 +63,9 @@ namespace RestWithASPNETUdemy.Controllers
 
         // PUT api/values/5
         [HttpPut]
+        [ProducesResponseType(typeof(PersonVO), 202)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Put([FromBody] PersonVO person)
         {
@@ -60,6 +76,9 @@ namespace RestWithASPNETUdemy.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Delete(int id)
         {
