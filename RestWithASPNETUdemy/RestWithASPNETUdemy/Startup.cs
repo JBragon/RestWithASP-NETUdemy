@@ -17,6 +17,10 @@ using Tapioca.HATEOAS;
 using RestWithASPNETUdemy.HyperMedia;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Rewrite;
+using RestWithASPNETUdemy.Security.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RestWithASPNETUdemy
 {
@@ -41,26 +45,53 @@ namespace RestWithASPNETUdemy
 
             services.AddDbContext<MySQLContext>(options => options.UseMySql(connectionString));
 
-            if (_enviroment.IsDevelopment())
+            ExecuteMigrations(connectionString);
+
+            var signingConfigurations = new SigningConfigurations();
+            services.AddSingleton(signingConfigurations);
+
+            var tokenConfigurations = new TokenConfiguration();
+
+            //consulta no appsettings.json os parâmetros da section "TokenConfigurations"
+            new ConfigureFromConfigurationOptions<TokenConfiguration>(
+                _configuration.GetSection("TokenConfigurations")
+            )
+            .Configure(tokenConfigurations);
+
+            services.AddSingleton(tokenConfigurations);
+
+
+            services.AddAuthentication(authOptions =>
             {
-                try
-                {
-                    var evolveConnection = new MySql.Data.MySqlClient.MySqlConnection(connectionString);
+                authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(bearerOptions =>
+            {
+                var paramsValidation = bearerOptions.TokenValidationParameters;
+                paramsValidation.IssuerSigningKey = signingConfigurations.Key;
+                paramsValidation.ValidAudience = tokenConfigurations.Audience;
+                paramsValidation.ValidIssuer = tokenConfigurations.Issuer;
 
-                    var evolve = new Evolve.Evolve(evolveConnection, msg => _logger.LogInformation(msg))
-                    {
-                        Locations = new List<string> { "db/migrations" },
-                        IsEraseDisabled = true
-                    };
+                // Validates the signing of a received token
+                paramsValidation.ValidateIssuerSigningKey = true;
 
-                    evolve.Migrate();
-                }
-                catch(Exception e)
-                {
-                    _logger.LogCritical("Database migration failed", e);
-                    throw;
-                }
-            }
+                // Checks if a received token is still valid
+                paramsValidation.ValidateLifetime = true;
+
+                // Tolerance time for the expiration of a token (used in case
+                // of time synchronization problems between different
+                // computers involved in the communication process)
+                paramsValidation.ClockSkew = TimeSpan.Zero;
+            });
+
+            // Enables the use of the token as a means of
+            // authorizing access to this project's resources
+            services.AddAuthorization(auth =>
+            {
+                auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme‌​)
+                    .RequireAuthenticatedUser().Build());
+            });
 
             services.AddMvc(options =>
             {
@@ -78,10 +109,11 @@ namespace RestWithASPNETUdemy
 
             services.AddApiVersioning();
 
-            services.AddSwaggerGen(c => 
+            services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", 
-                    new Info {
+                c.SwaggerDoc("v1",
+                    new Info
+                    {
                         Title = "RESTful API With ASP.NET Core 2.0",
                         Version = "v1"
                     });
@@ -89,10 +121,36 @@ namespace RestWithASPNETUdemy
             //Dependecy Injection
             services.AddScoped<IPersonBusiness, PersonBusinessImpl>();
             services.AddScoped<IBookBusiness, BookBusinessImpl>();
-            services.AddScoped<IPersonRepository, PersonRepositoryImpl>();
+            services.AddScoped<ILoginBusiness, LoginBusinessImpl>();
+
+            services.AddScoped<IUserRepository, UserRepositoryImpl>();
 
             //Dependecy Injection of GenericRepository
             services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+        }
+
+        private void ExecuteMigrations(string connectionString)
+        {
+            if (_enviroment.IsDevelopment())
+            {
+                try
+                {
+                    var evolveConnection = new MySql.Data.MySqlClient.MySqlConnection(connectionString);
+
+                    var evolve = new Evolve.Evolve(evolveConnection, msg => _logger.LogInformation(msg))
+                    {
+                        Locations = new List<string> { "db/migrations" },
+                        IsEraseDisabled = true
+                    };
+
+                    evolve.Migrate();
+                }
+                catch (Exception e)
+                {
+                    _logger.LogCritical("Database migration failed", e);
+                    throw;
+                }
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
