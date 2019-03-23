@@ -79,6 +79,20 @@ namespace RestWithASPNETUdemy.Controllers
             return new ObjectResult(_personBusiness.Update(person));
         }
 
+        // PUT api/values/5
+        [HttpPatch]
+        [ProducesResponseType(typeof(PersonVO), 202)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [Authorize("Bearer")]
+        [TypeFilter(typeof(HyperMediaFilter))]
+        public ActionResult Patch([FromBody] PersonVO person)
+        {
+            if (person == null) return BadRequest();
+
+            return new OkObjectResult(_personBusiness.Update(person));
+        }
+
         // DELETE api/values/5
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
