@@ -11,6 +11,7 @@ namespace RestWithASPNETUdemy.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1")]
     [ApiController]
+    [Authorize("Bearer")]
     public class PersonsController : ControllerBase
     {
         private IPersonBusiness _personBusiness;
@@ -26,7 +27,6 @@ namespace RestWithASPNETUdemy.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [Authorize("Bearer")]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Get()
         {
@@ -40,7 +40,6 @@ namespace RestWithASPNETUdemy.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
-        [Authorize("Bearer")]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Get(int id)
         {
@@ -51,12 +50,33 @@ namespace RestWithASPNETUdemy.Controllers
             return Ok(person);
         }
 
+        [HttpGet("FindByName")]
+        [ProducesResponseType(typeof(List<PersonVO>), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [TypeFilter(typeof(HyperMediaFilter))]
+        public ActionResult GetByName([FromQuery] string firstName, [FromQuery] string lastName)
+        {
+            return Ok(_personBusiness.FindByName(firstName, lastName));
+        }
+        
+        [HttpGet("GetByNameWithPagedSearch/{sortDirection}/{pageSize}/{page}")]
+        [ProducesResponseType(typeof(List<PersonVO>), 200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [TypeFilter(typeof(HyperMediaFilter))]
+        public ActionResult GetByNameWithPagedSearch([FromQuery] string name, string sortDirection, int pageSize, int page)
+        {
+            return Ok(_personBusiness.FindWithPagedSearch(name, sortDirection, pageSize, page));
+        }
+
         // POST api/values
         [HttpPost]
         [ProducesResponseType(typeof(PersonVO), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [Authorize("Bearer")]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Post([FromBody] PersonVO person)
         {
@@ -70,7 +90,6 @@ namespace RestWithASPNETUdemy.Controllers
         [ProducesResponseType(typeof(PersonVO), 202)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [Authorize("Bearer")]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Put([FromBody] PersonVO person)
         {
@@ -84,7 +103,6 @@ namespace RestWithASPNETUdemy.Controllers
         [ProducesResponseType(typeof(PersonVO), 202)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [Authorize("Bearer")]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Patch([FromBody] PersonVO person)
         {
@@ -98,7 +116,6 @@ namespace RestWithASPNETUdemy.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [Authorize("Bearer")]
         [TypeFilter(typeof(HyperMediaFilter))]
         public ActionResult Delete(int id)
         {

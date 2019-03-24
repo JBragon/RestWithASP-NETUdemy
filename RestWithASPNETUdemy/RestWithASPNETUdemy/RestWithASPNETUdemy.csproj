@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="db\dataset\V1_0_5__Insert_data_in_persons.sql" />
+    <None Remove="db\dataset\V1_0_6__Insert_data_in_persons.sql" />
+    <None Remove="db\dataset\V1_0_8__Insert_data_in_persons.sql" />
     <None Remove="db\migrations\V1_0_2__Alter_Table_Persons.sql" />
     <None Remove="db\migrations\V1_0_3__Create_Table_books.sql" />
     <None Remove="db\migrations\V1_0_4__Create_Table_users.sql" />

@@ -3,15 +3,16 @@ using RestWithASPNETUdemy.Data.Converters;
 using RestWithASPNETUdemy.Data.VO;
 using RestWithASPNETUdemy.Models;
 using RestWithASPNETUdemy.Repository.Generic;
+using Tapioca.HATEOAS.Utils;
 
 namespace RestWithASPNETUdemy.Business.Implementations
 {
     public class PersonBusinessImpl : IPersonBusiness
     {
-        private IRepository<Person> _repository;
+        private IPersonRepository _repository;
         private readonly PersonConverter _converter;
 
-        public PersonBusinessImpl(IRepository<Person> repository)
+        public PersonBusinessImpl(IPersonRepository repository)
         {
             _repository = repository;
             _converter = new PersonConverter();
@@ -39,6 +40,11 @@ namespace RestWithASPNETUdemy.Business.Implementations
             return _converter.Parse(_repository.FindById(id));
         }
 
+        public List<PersonVO> FindByName(string firstName, string lastName)
+        {
+            return _converter.ParseList(_repository.FindByName(firstName, lastName));
+        }
+
         public PersonVO Update(PersonVO person)
         {
             var personEntity = _converter.Parse(person);
@@ -46,5 +52,24 @@ namespace RestWithASPNETUdemy.Business.Implementations
             return _converter.Parse(personEntity);
         }
 
+        public PagedSearchDTO<PersonVO> FindWithPagedSearch(string name, string sortDirection, int pageSize, int page)
+        {
+            page = page > 0 ? page - 1 : 0;
+
+            string query = @"select * from persons p where 1 = 1 ";
+            if (!string.IsNullOrEmpty(name)) query += $"and p.FirstName like '%{name}%' ";
+            query += $"order by p.FirstName {sortDirection} limit {pageSize} offset {page}";
+
+            var persons = _converter.ParseList(_repository.FindWithPagedSearch(query));
+            
+            return new PagedSearchDTO<PersonVO>
+            {
+                CurrentPage = page + 1,
+                List = persons,
+                PageSize = pageSize,
+                SortDirections = sortDirection,
+                TotalResults = persons.Count
+            };
+        }
     }
 }
