@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RestWithASPNETUdemy.Models
 {
-
+    [Table("persons")]
     public class Person : BaseEntity
     {
         public string FirstName { get; set; }
