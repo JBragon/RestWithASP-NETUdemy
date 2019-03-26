@@ -114,7 +114,7 @@ namespace RestWithASPNETUdemy
                 c.SwaggerDoc("v1",
                     new Info
                     {
-                        Title = "RESTful API With ASP.NET Core 2.0",
+                        Title = "RESTful API With ASP.NET Core 2.0 By Jordan Bragon",
                         Version = "v1"
                     });
             });
